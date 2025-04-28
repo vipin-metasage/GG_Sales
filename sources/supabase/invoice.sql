@@ -1,8 +1,10 @@
 SELECT
   billing_date::date,
-  INITCAP(LOWER(customer_name)) customer_name,
+  INITCAP(LOWER(customer_name)) as original_customer_name,
+  REGEXP_REPLACE(INITCAP(LOWER(customer_name)), '[^a-zA-Z0-9]', '_', 'g') as customer_name,
   destination_country,
-  INITCAP(LOWER(material_description)) material_description,
+  INITCAP(LOWER(material_description)) as original_material_description,
+  REGEXP_REPLACE(INITCAP(LOWER(material_description)), '[^a-zA-Z0-9]', '_', 'g') as material_description,
   material_number,
   actual_invoiced_quantity::numeric as actual_invoiced_quantity,
   billing_qty::numeric as billing_qty,

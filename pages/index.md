@@ -219,8 +219,8 @@ SELECT
   current_unit_price,
   last_unit_price,
   '/pricing/details/' || 
-    REGEXP_REPLACE(customer, '[^a-zA-Z0-9]', '_', 'g') || '/' || 
-    REGEXP_REPLACE(sku, '[^a-zA-Z0-9]', '_', 'g') AS detail_link,
+    customer || '/' || 
+    sku AS detail_link,
   NULLIF(
     last_price_change_date::DATE,
     '1970-01-01'::DATE

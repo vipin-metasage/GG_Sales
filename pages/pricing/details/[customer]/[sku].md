@@ -1,9 +1,9 @@
 ```sql sku_summary
 WITH filtered_data AS (
   SELECT
-    customer_name AS customer,
+    original_customer_name AS customer,
     destination_country AS country,
-    material_description AS sku,
+    original_material_description AS sku,
     billing_date,
     billing_document,
     net,
@@ -13,8 +13,8 @@ WITH filtered_data AS (
     unit_price
   FROM supabase.invoice
   WHERE billing_qty > 0
-  AND REGEXP_REPLACE(customer_name, '[^a-zA-Z0-9]', '_', 'g') = '${params.customer}'
-  AND REGEXP_REPLACE(material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+  AND customer_name = '${params.customer}'
+  AND material_description = '${params.sku}'
 ),
 base_stats AS (
   SELECT
@@ -86,17 +86,17 @@ SELECT * FROM final;
 
 ```sql sku
   select
-      material_description  as sku
+      original_material_description as sku
   from Supabase.invoice
   where customer_name = '${params.customer}'
-  group by material_description
+  group by original_material_description
 ```
 ```sql customer
   select
-      customer_name  as customer
+      original_customer_name as customer
   from Supabase.invoice
   where customer_name = '${params.customer}'
-  group by customer_name
+  group by original_customer_name
 ```
 
 <Grid cols=2>
@@ -111,7 +111,7 @@ SELECT * FROM final;
 
 </Grid>
 
-## SKU Pricing Summary for {params.customer} - {params.sku}
+ ### SKU Pricing Summary for {params.customer} - {params.sku}
 
 <Grid cols=3>
   <BigValue 
@@ -179,7 +179,7 @@ SELECT * FROM final;
   yAxisTitle="Unit Price"
   y2AxisTitle="Oil Price"
   color=billing_qty
-  title="Customer–SKU Pricing Over Time"
+  title="Customer SKU Pricing Over Time"
   colorPalette={
   [
     '#1E90FF',  // Blue
@@ -227,7 +227,7 @@ SELECT * FROM final;
 SELECT
   billing_date,
   billing_document,
-  material_description AS sku,
+  original_material_description AS sku,
   net,
   doc_currency as currency,
   sales_unit,
@@ -235,8 +235,8 @@ SELECT
   billing_qty
 FROM supabase.invoice
 WHERE billing_qty > 0
-  AND REGEXP_REPLACE(customer_name, '[^a-zA-Z0-9]', '_', 'g') = '${params.customer}'
-  AND REGEXP_REPLACE(material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+  AND customer_name = '${params.customer}'
+  AND material_description = '${params.sku}'
 ORDER BY billing_date;
 ```
 ```sql sku_price_oil_price
@@ -248,8 +248,8 @@ FROM supabase.invoice AS i
 LEFT JOIN supabase.crudeoil AS d
   ON d.date = i.billing_date::date
 WHERE i.billing_qty > 0
-  AND REGEXP_REPLACE(i.customer_name, '[^a-zA-Z0-9]', '_', 'g') = '${params.customer}'
-  AND REGEXP_REPLACE(i.material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+  AND i.customer_name = '${params.customer}'
+  AND i.material_description = '${params.sku}'
 GROUP BY
   billing_date
 ORDER BY
@@ -263,8 +263,8 @@ SELECT
   COUNT(DISTINCT billing_document) AS orders
 FROM supabase.invoice
 WHERE billing_qty > 0
-  AND REGEXP_REPLACE(customer_name, '[^a-zA-Z0-9]', '_', 'g') = '${params.customer}'
-  AND REGEXP_REPLACE(material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+  AND customer_name = '${params.customer}'
+  AND material_description = '${params.sku}'
 GROUP BY month
 ORDER BY month;
 ```
@@ -276,8 +276,8 @@ SELECT
   SUM(billing_qty) * 1.0 / NULLIF(COUNT(DISTINCT billing_document), 0) AS avg_order_size
 FROM supabase.invoice
 WHERE billing_qty > 0
-  AND REGEXP_REPLACE(customer_name, '[^a-zA-Z0-9]', '_', 'g') = '${params.customer}'
-  AND REGEXP_REPLACE(material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+  AND customer_name = '${params.customer}'
+  AND material_description = '${params.sku}'
 GROUP BY month
 ORDER BY month;
 ```
@@ -311,7 +311,7 @@ ORDER BY month;
 SELECT
   DATE_TRUNC('month', billing_date) AS month,
   SUM(CASE 
-      WHEN REGEXP_REPLACE(material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+      WHEN material_description = '${params.sku}'
       THEN net::numeric 
       ELSE 0 
   END) AS sku_revenue,
@@ -320,7 +320,7 @@ SELECT
     WHEN SUM(net::numeric) = 0 THEN 0
     ELSE 
       SUM(CASE 
-          WHEN REGEXP_REPLACE(material_description, '[^a-zA-Z0-9]', '_', 'g') = '${params.sku}'
+          WHEN material_description = '${params.sku}'
           THEN net::numeric 
           ELSE 0 
       END) / SUM(net::numeric)
@@ -328,7 +328,7 @@ SELECT
 FROM supabase.invoice
 WHERE 
   billing_qty > 0
-  AND REGEXP_REPLACE(customer_name, '[^a-zA-Z0-9]', '_', 'g') = '${params.customer}'
+  AND customer_name = '${params.customer}'
   AND net ~ '^[0-9.]+$'
 GROUP BY 1
 ORDER BY 1;
