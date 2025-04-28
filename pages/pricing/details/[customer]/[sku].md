@@ -1,9 +1,9 @@
 ```sql sku_summary
 WITH filtered_data AS (
   SELECT
-    original_customer_name AS customer,
+    customer_name AS customer,
     destination_country AS country,
-    original_material_description AS sku,
+    material_description AS sku,
     billing_date,
     billing_document,
     net,
@@ -13,8 +13,8 @@ WITH filtered_data AS (
     unit_price
   FROM supabase.invoice
   WHERE billing_qty > 0
-  AND customer_name = '${params.customer}'
-  AND material_description = '${params.sku}'
+  AND customer_id LIKE '${inputs.customer_id.value}'
+  AND sku_id LIKE '${inputs.sku_id.value}'
 ),
 base_stats AS (
   SELECT
@@ -86,30 +86,41 @@ SELECT * FROM final;
 
 ```sql sku
   select
-      original_material_description as sku
+      sku_id as sku_id,
+      material_description as sku
   from Supabase.invoice
-  where customer_name = '${params.customer}'
-  group by original_material_description
-```
-```sql customer
-  select
-      original_customer_name as customer
-  from Supabase.invoice
-  where customer_name = '${params.customer}'
-  group by original_customer_name
+  where customer_id = '${params.customer}'
+  group by sku_id, material_description
 ```
 
-<Grid cols=2>
+```sql customer
+  select
+      customer_id as customer_id,
+      customer_name as customer
+  from Supabase.invoice
+  where customer_id = '${params.customer}'
+  group by customer_id, customer_name
+```
+
+<Grid cols=4>
+
+<Dropdown data={sku} name=sku_id value=sku_id defaultValue='{params.sku}' title="SKU ID">
+  <DropdownOption value="%" valueLabel="All SKUs"/>
+</Dropdown>
 
 <Dropdown data={sku} name=sku value=sku defaultValue='{params.sku}' title="SKU">
   <DropdownOption value="%" valueLabel="All SKUs"/>
 </Dropdown>
 
 
+<Dropdown data={customer} name=customer_id value=customer_id defaultValue='{params.customer}' title="Customer ID">
+</Dropdown>
+
 <Dropdown data={customer} name=customer value=customer defaultValue='{params.customer}' title="Customer">
 </Dropdown>
 
 </Grid>
+
 
  ### SKU Pricing Summary for {params.customer} - {params.sku}
 
@@ -227,7 +238,7 @@ SELECT * FROM final;
 SELECT
   billing_date,
   billing_document,
-  original_material_description AS sku,
+  material_description AS sku,
   net,
   doc_currency as currency,
   sales_unit,
@@ -235,10 +246,11 @@ SELECT
   billing_qty
 FROM supabase.invoice
 WHERE billing_qty > 0
-  AND customer_name = '${params.customer}'
-  AND material_description = '${params.sku}'
+  AND customer_id LIKE '${inputs.customer_id.value}'
+  AND sku_id LIKE '${inputs.sku_id.value}'
 ORDER BY billing_date;
 ```
+
 ```sql sku_price_oil_price
 SELECT
   (i.billing_date::date)          AS billing_date,
@@ -248,8 +260,8 @@ FROM supabase.invoice AS i
 LEFT JOIN supabase.crudeoil AS d
   ON d.date = i.billing_date::date
 WHERE i.billing_qty > 0
-  AND i.customer_name = '${params.customer}'
-  AND i.material_description = '${params.sku}'
+  AND i.customer_id LIKE '${inputs.customer_id.value}'
+  AND i.sku_id LIKE '${inputs.sku_id.value}'
 GROUP BY
   billing_date
 ORDER BY
@@ -263,12 +275,11 @@ SELECT
   COUNT(DISTINCT billing_document) AS orders
 FROM supabase.invoice
 WHERE billing_qty > 0
-  AND customer_name = '${params.customer}'
-  AND material_description = '${params.sku}'
+  AND customer_id LIKE '${inputs.customer_id.value}'
+  AND sku_id LIKE '${inputs.sku_id.value}'
 GROUP BY month
 ORDER BY month;
 ```
-
 
 ```sql avg_order_size_over_time
 SELECT
@@ -276,11 +287,12 @@ SELECT
   SUM(billing_qty) * 1.0 / NULLIF(COUNT(DISTINCT billing_document), 0) AS avg_order_size
 FROM supabase.invoice
 WHERE billing_qty > 0
-  AND customer_name = '${params.customer}'
-  AND material_description = '${params.sku}'
+  AND customer_id LIKE '${inputs.customer_id.value}'
+  AND sku_id LIKE '${inputs.sku_id.value}'
 GROUP BY month
 ORDER BY month;
 ```
+
 <Grid >
 
 
@@ -311,7 +323,7 @@ ORDER BY month;
 SELECT
   DATE_TRUNC('month', billing_date) AS month,
   SUM(CASE 
-      WHEN material_description = '${params.sku}'
+      WHEN sku_id LIKE '${inputs.sku_id.value}'
       THEN net::numeric 
       ELSE 0 
   END) AS sku_revenue,
@@ -320,7 +332,7 @@ SELECT
     WHEN SUM(net::numeric) = 0 THEN 0
     ELSE 
       SUM(CASE 
-          WHEN material_description = '${params.sku}'
+          WHEN sku_id LIKE '${inputs.sku_id.value}'
           THEN net::numeric 
           ELSE 0 
       END) / SUM(net::numeric)
@@ -328,7 +340,7 @@ SELECT
 FROM supabase.invoice
 WHERE 
   billing_qty > 0
-  AND customer_name = '${params.customer}'
+  AND customer_id LIKE '${inputs.customer_id.value}'
   AND net ~ '^[0-9.]+$'
 GROUP BY 1
 ORDER BY 1;
