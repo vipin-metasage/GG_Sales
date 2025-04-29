@@ -50,6 +50,14 @@ GROUP BY material_description
 ORDER BY sku
 ```
 
+```sql sku_id
+SELECT
+    sku_id as sku_id
+FROM Supabase.invoice
+GROUP BY sku_id
+ORDER BY sku_id
+```
+
 <center>
 <Dropdown data={customer} name=customer value=customer title="Customer">
     <DropdownOption value="%" valueLabel="All"/>
@@ -74,6 +82,10 @@ ORDER BY sku
 <Dropdown data={sku} name=sku value=sku title="SKU" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
+
+<Dropdown data={sku_id} name=sku_id value=sku_id title="SKU ID" defaultValue="%">
+    <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
 </center>
 
 ```sql total_cust_served
@@ -87,6 +99,7 @@ WHERE EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
     AND doc_currency LIKE '${inputs.currency.value}'
     AND sales_unit LIKE '${inputs.sales_unit.value}'
     AND material_description LIKE '${inputs.sku.value}'  
+    AND sku_id LIKE '${inputs.sku_id.value}'
 GROUP BY month
 ORDER BY month
 ```
@@ -102,6 +115,7 @@ WHERE EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
     AND doc_currency LIKE '${inputs.currency.value}'
     AND sales_unit LIKE '${inputs.sales_unit.value}'
     AND material_description LIKE '${inputs.sku.value}'
+    AND sku_id LIKE '${inputs.sku_id.value}'
 GROUP BY year
 ORDER BY year
 ```
@@ -128,6 +142,7 @@ WITH base AS (
         customer_name AS customer,
         destination_country AS country,
         material_description AS sku,
+        sku_id,
         billing_date,
         billing_document,
         net,
@@ -147,6 +162,7 @@ aggregated AS (
         customer,
         country,
         sku,
+        sku_id,
         MAX(billing_date) AS latest_invoice_date,
         ANY_VALUE(sales_unit) AS sales_unit,
         ANY_VALUE(currency) AS currency,
@@ -212,12 +228,14 @@ aggregated AS (
         AND currency LIKE '${inputs.currency.value}'
         AND sales_unit LIKE '${inputs.sales_unit.value}'
         AND sku LIKE '${inputs.sku.value}'
-    GROUP BY customer, country, sku
+        AND sku_id LIKE '${inputs.sku_id.value}'
+    GROUP BY customer, country, sku, sku_id
 )
 SELECT
     customer,
     country,
     sku,
+    sku_id,
     latest_invoice_date,
     sales_unit,
     currency,
@@ -244,6 +262,7 @@ ORDER BY revenue_1y DESC
     link=detail_link
     rows=15
     wrapTitles=true
+    search=true
 >
     <Column id="customer" title="Customer" align="left" />
     <Column id="country" title="Country" align="center" />

@@ -256,6 +256,7 @@ ORDER BY billing_date DESC
     wrapCells=true 
     sort="billing_date desc" 
     rowShading=true
+    search=true
 >
     <Column id=billing_date title="Date" align=left/>
     <Column id=billing_document fmt=0 align=center/>
