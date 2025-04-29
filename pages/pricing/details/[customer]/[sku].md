@@ -287,7 +287,7 @@ SELECT
 FROM supabase.invoice
 WHERE 
   billing_qty > 0
-  AND customer_id LIKE '${inputs.customer.value}'
+  AND customer_name LIKE '${inputs.customer.value}'
   AND net ~ '^[0-9.]+$'
 GROUP BY 1
 ORDER BY 1;
