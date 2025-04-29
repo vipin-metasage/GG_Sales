@@ -26,6 +26,6 @@ WHERE
   )
   AND billing_document IS NOT NULL
   AND material_group IS NOT NULL
-  AND sold_to_party = '0050005049'
+  AND sold_to_party = '0050002254'
   AND billing_date::date >= '2015-01-01'
 ORDER BY billing_date DESC;
