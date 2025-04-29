@@ -1,7 +1,6 @@
 SELECT
   billing_date::date,
   REGEXP_REPLACE(INITCAP(LOWER(customer_name)), '[^a-zA-Z0-9]', '_', 'g') as customer_name,
-  LOWER(REGEXP_REPLACE(sold_to_party, '^0+', '')) as customer_id,
   destination_country,
   REGEXP_REPLACE(INITCAP(LOWER(material_description)), '[^a-zA-Z0-9]', '_', 'g') as material_description,
   LOWER(REGEXP_REPLACE(material_number, '^0+', '')) as sku_id,
@@ -26,5 +25,4 @@ WHERE
   )
   AND billing_document IS NOT NULL
   AND material_group IS NOT NULL
-  AND billing_date::date >= '2015-01-01'
-ORDER BY billing_date DESC;
+  AND billing_date::date >= '2015-01-01';

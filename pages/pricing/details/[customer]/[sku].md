@@ -129,45 +129,30 @@ WHERE customer_name LIKE '${inputs.customer.value}'
 ORDER BY billing_date DESC
 ```
 ```sql sku
-SELECT
-    customer_id,
-    material_description AS sku
-FROM Supabase.invoice
-WHERE customer_id  = '${params.customer}'
-GROUP BY customer_id, material_description
-ORDER BY material_description, customer_id
+  select
+      material_description as sku
+  from Supabase.invoice
+  where customer_name = '${params.customer}'
+  group by material_description
 ```
-
 ```sql customer
-SELECT
-    customer_id,
-    customer_name AS customer
-FROM Supabase.invoice
-WHERE customer_id  = '${params.customer}'
-GROUP BY customer_id, customer_name
-ORDER BY customer_name
+  select
+      customer_name as customer
+  from Supabase.invoice
+  where customer_name = '${params.customer}'
+  group by customer_name
 ```
 
-<Grid cols={2}>
-    <Dropdown
-        data={customer}
-        name="customer"
-        value="customer"
-        title="Customer"
-        defaultValue={params.customer}
-    >
-        <DropdownOption value="%" valueLabel="All Customers" defaultValue= '${params.customer}'/>
-    </Dropdown>
+<Grid cols=2>
 
-    <Dropdown
-        data={sku}
-        name="sku"
-        value="sku"
-        title="SKU"
-        defaultValue={params.sku}
-    >
-        <DropdownOption value="%" valueLabel="All SKUs"/>
-    </Dropdown>
+<Dropdown data={sku} name=sku value=sku defaultValue='{params.sku}' title="SKU">
+  <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
+
+
+<Dropdown data={customer} name=customer value=customer defaultValue='{params.customer}' title="Customer">
+</Dropdown>
+
 </Grid>
 
 ### SKU Pricing Summary for {params.customer} - {params.sku}
