@@ -15,6 +15,7 @@ WITH filtered_data AS (
     WHERE billing_qty > 0
         AND customer_name LIKE '${inputs.customer.value}'
         AND material_description LIKE '${inputs.sku.value}'
+        AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}' 
 ),
 base_stats AS (
     SELECT
@@ -87,17 +88,59 @@ SELECT * FROM final
 
 
 ```sql sku_price_oil_price
-SELECT
-    i.billing_date,
-    i.unit_price AS avg_unit_price,
-    i.billing_qty,
-    o.dollars_per_barrel
-FROM Supabase.invoice i
-LEFT JOIN Supabase.crudeoil o ON o.date = i.billing_date::date
-WHERE i.customer_name LIKE '${inputs.customer.value}'
-    AND i.material_description LIKE '${inputs.sku.value}'
-    AND i.billing_qty > 0
-ORDER BY i.billing_date
+WITH invoice_data AS (
+    SELECT
+        i.billing_date AS date,
+        AVG(i.unit_price) AS unit_price
+    FROM Supabase.invoice i
+    WHERE i.customer_name LIKE '${inputs.customer.value}'
+        AND i.material_description LIKE '${inputs.sku.value}'
+        AND i.billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+    GROUP BY i.billing_date
+),
+oil_data AS (
+    SELECT 
+        o.date,
+        o.dollars_per_barrel,
+        o.usd_inr
+    FROM Supabase.crudeoil o
+    WHERE EXISTS (
+        SELECT 1 FROM invoice_data i
+        WHERE i.date::date = o.date
+    )
+),
+combined_data AS (
+    SELECT
+        i.date AS month,
+        i.unit_price,
+        o.dollars_per_barrel,
+        o.usd_inr
+    FROM invoice_data i
+    JOIN oil_data o ON i.date::date = o.date
+)
+SELECT 
+    month,
+    'Unit Price' AS category,
+    unit_price AS value
+FROM combined_data
+
+UNION ALL
+
+SELECT 
+    month,
+    'Oil Price' AS category,
+    dollars_per_barrel AS value
+FROM combined_data
+
+UNION ALL
+
+SELECT 
+    month,
+    'USD-INR' AS category,
+    usd_inr AS value
+FROM combined_data
+ORDER BY month, category
 ```
 
 ```sql revenue_and_orders_over_time
@@ -109,6 +152,7 @@ FROM Supabase.invoice
 WHERE customer_name LIKE '${inputs.customer.value}'
     AND material_description LIKE '${inputs.sku.value}'
     AND billing_qty > 0
+    AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
 GROUP BY month
 ORDER BY month
 ```
@@ -125,6 +169,7 @@ SELECT
 FROM Supabase.invoice
 WHERE customer_name LIKE '${inputs.customer.value}'
     AND material_description LIKE '${inputs.sku.value}'
+    AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
     AND billing_qty > 0
 ORDER BY billing_date DESC
 ```
@@ -142,13 +187,25 @@ ORDER BY billing_date DESC
   where customer_name = '${params.customer}'
   group by customer_name
 ```
+```sql year
+SELECT
+  EXTRACT(YEAR FROM billing_date) AS year
+FROM Supabase.invoice
+WHERE customer_name LIKE '${params.customer}'
+GROUP BY year
+ORDER BY year DESC
+```
 
-<Grid cols=2>
+
+<Grid cols=3>
+
+<Dropdown data={year} name=year value=year defaultValue='%' title="Year">
+<DropdownOption value="%" valueLabel="All Years"/>
+</Dropdown>
 
 <Dropdown data={sku} name=sku value=sku defaultValue='{params.sku}' title="SKU">
   <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
-
 
 <Dropdown data={customer} name=customer value=customer defaultValue='{params.customer}' title="Customer">
 </Dropdown>
@@ -214,19 +271,23 @@ ORDER BY billing_date DESC
 </Grid>
 
 <Grid cols=2>
+
     <LineChart 
+    
         data={sku_price_oil_price}
-        x=billing_date
-        y=avg_unit_price
-        y2=dollars_per_barrel
-        yAxisTitle="Unit Price"
-        y2AxisTitle="Oil Price"
-        color=billing_qty
+        x=month
+        y=value
+        yAxisTitle="Values"
+        series=category
         title="Customer SKU Pricing Over Time"
         colorPalette={[
-            '#1E90FF',  // Blue
-            '#654321',  // Dark Brown
-        ]}
+  '#E4572E', // fiery orange-red
+   // bright teal
+  '#FFC914', // vivid yellow
+  '#17BEBB', // strong blue
+  '#F45B69'  // punchy pink
+]}
+        independentYAxes={true}
     />
 
     <LineChart 
@@ -241,9 +302,12 @@ ORDER BY billing_date DESC
         ytitle="Revenue"
         y2title="Orders"
         colorPalette={[
-            '#01579B',
-            '#e88a87',
-        ]}
+  '#E4572E', // fiery orange-red
+  '#17BEBB', // bright teal
+  '#FFC914', // vivid yellow
+  '#2E86AB', // strong blue
+  '#F45B69'  // punchy pink
+]}
     />
 </Grid>
 
@@ -294,4 +358,26 @@ GROUP BY 1
 ORDER BY 1;
 ```
 
+```sql avg_qty_per_order_over_time
+SELECT
+    DATE_TRUNC('month', billing_date) AS month,
+    SUM(billing_qty) / COUNT(DISTINCT billing_document) AS avg_qty_per_order
+FROM Supabase.invoice
+WHERE customer_name LIKE '${inputs.customer.value}'
+    AND material_description LIKE '${inputs.sku.value}'
+    AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+    AND billing_qty > 0
+GROUP BY month
+ORDER BY month
+```
 
+<LineChart
+data={avg_qty_per_order_over_time}
+x=month
+y=avg_qty_per_order
+yAxisTitle="Avg Quantity"
+title="Average Order Quantity Over Time"
+colorPalette={[
+'#17BEBB' // bright teal
+]}
+/>
