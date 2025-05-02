@@ -14,7 +14,9 @@ SELECT
   sales_item,
   incoterms_part1,
   material_group,
-  unit_price
+  unit_price,
+  incoterms_part1,
+  sd_item_category
 FROM cust_gg.invoice_data1
 WHERE 
   material_group IN (
@@ -25,5 +27,7 @@ WHERE
     '0713', '0714', '0715', '0716', '0799'
   )
   AND billing_document IS NOT NULL
+  AND incoterms_part1 NOT IN ('EXW')
   AND material_group IS NOT NULL
+  AND billing_qty > 0
   AND billing_date::date >= '2015-01-01';

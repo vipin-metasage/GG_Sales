@@ -10,6 +10,14 @@ GROUP BY customer_name
 ORDER BY customer_name
 ```
 
+```sql incoterms
+SELECT
+    incoterms_part1 as incoterms
+FROM Supabase.invoice
+GROUP BY incoterms_part1
+ORDER BY incoterms_part1
+```
+
 ```sql year
 SELECT
     EXTRACT(YEAR FROM billing_date) as year 
@@ -75,6 +83,10 @@ ORDER BY sku_id
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
 
+<Dropdown data={incoterms} name=incoterms value=incoterms title="Incoterms" defaultValue="%">
+    <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
+
 <Dropdown data={sales_unit} name=sales_unit value=sales_unit title="Sales Unit" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
@@ -86,55 +98,8 @@ ORDER BY sku_id
 <Dropdown data={sku_id} name=sku_id value=sku_id title="SKU ID" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
-</center>
+</center>   
 
-```sql total_cust_served
-SELECT
-    DATE_TRUNC('month', billing_date) AS month,
-    COUNT(DISTINCT customer_name) AS unique_customers
-FROM invoice
-WHERE EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
-    AND customer_name LIKE '${inputs.customer.value}'
-    AND destination_country LIKE '${inputs.country.value}'
-    AND doc_currency LIKE '${inputs.currency.value}'
-    AND sales_unit LIKE '${inputs.sales_unit.value}'
-    AND material_description LIKE '${inputs.sku.value}'  
-    AND sku_id LIKE '${inputs.sku_id.value}'
-GROUP BY month
-ORDER BY month
-```
-
-```sql sku_count_served
-SELECT
-    DATE_TRUNC('year', billing_date) AS year,
-    COUNT(DISTINCT sku_id) AS unique_skus
-FROM invoice
-WHERE EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
-    AND customer_name LIKE '${inputs.customer.value}'
-    AND destination_country LIKE '${inputs.country.value}'
-    AND doc_currency LIKE '${inputs.currency.value}'
-    AND sales_unit LIKE '${inputs.sales_unit.value}'
-    AND material_description LIKE '${inputs.sku.value}'
-    AND sku_id LIKE '${inputs.sku_id.value}'
-GROUP BY year
-ORDER BY year
-```
-
-<Grid cols=2>
-<LineChart 
-    data={total_cust_served}
-    x=month
-    y=unique_customers
-    title="Total Customers Served Over Time"
-/>
-
-<LineChart 
-    data={sku_count_served}
-    x=year
-    y=unique_skus
-    title="SKU Count Served Over Time"
-/>
-</Grid>
 
 ```sql sku_price_changes
 WITH base AS (
@@ -150,7 +115,9 @@ WITH base AS (
         sales_unit,
         doc_currency AS currency,
         EXTRACT(YEAR FROM billing_date) AS billing_year,
-        unit_price
+        unit_price,
+        sd_item_category,
+        incoterms_part1
     FROM invoice
 ),  
 year_ref AS (
@@ -229,6 +196,7 @@ aggregated AS (
         AND sales_unit LIKE '${inputs.sales_unit.value}'
         AND sku LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
     GROUP BY customer, country, sku, sku_id
 )
 SELECT
@@ -253,6 +221,7 @@ SELECT
     revenue_1y,
     revenue_3y
 FROM aggregated
+WHERE latest_invoice_date >= CURRENT_DATE - INTERVAL '3 months'
 ORDER BY revenue_1y DESC
 ```
 
@@ -260,7 +229,7 @@ ORDER BY revenue_1y DESC
     data={sku_price_changes}
     title="Customer SKU Pricing Overview"
     link=detail_link
-    rows=15
+    rows=20
     wrapTitles=true
     search=true
 >
@@ -273,7 +242,7 @@ ORDER BY revenue_1y DESC
     <Column id="last_price_change_date" title="Last Price Change" align="center" colGroup="Timing"/>
     <Column id="years_since_price_change" title="Yrs Since Change" align="center" colGroup="Timing"/>
     <Column id="current_unit_price" title="Current Price" align="center" colGroup="Pricing"/>
-    <Column id="last_unit_price" title="Prev. Price" align="center" colGroup="Pricing"/>
+    <Column id="last_unit_price" title="Prev. Price" align="center" fmt="0.00" colGroup="Pricing"/>
     <Column id="orders" title="Orders" align="center" colGroup="Volume"/>
     <Column id="avg_sku_per_order" title="Avg/Order" align="center" colGroup="Volume"/>
     <Column id="sku_quantity" title="SKU Qty Sold" fmt='num1k' align="center" colGroup="Volume"/>

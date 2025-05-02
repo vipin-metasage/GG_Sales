@@ -10,7 +10,9 @@ WITH filtered_data AS (
         billing_qty,
         sales_unit,
         doc_currency,
-        unit_price
+        unit_price,
+        sd_item_category,
+        incoterms_part1
     FROM supabase.invoice
     WHERE billing_qty > 0
         AND customer_name LIKE '${inputs.customer.value}'
@@ -63,6 +65,11 @@ latest_txn AS (
         LIMIT 1
     ) AS latest
 ),
+currencies AS (
+    SELECT
+        STRING_AGG(DISTINCT doc_currency, ', ' ORDER BY doc_currency) AS currency_list
+    FROM filtered_data
+),
 final AS (
     SELECT
         bs.total_orders,
@@ -76,11 +83,12 @@ final AS (
         ROUND(COALESCE(yr.revenue, 0) * 100.0 / NULLIF(bs.total_revenue, 0), 2) AS current_year_share,
         lt.unit_price AS latest_unit_price,
         lt.sales_unit,
-        lt.doc_currency AS currency
+        c.currency_list AS currency
     FROM base_stats bs
     CROSS JOIN monthly_stats ms
     LEFT JOIN yearly_revenue_split yr ON yr.year = EXTRACT(YEAR FROM CURRENT_DATE)
     CROSS JOIN latest_txn lt
+    CROSS JOIN currencies c
 )
 SELECT * FROM final
 ```
@@ -143,11 +151,11 @@ FROM combined_data
 ORDER BY month, category
 ```
 
-```sql revenue_and_orders_over_time
+```sql revenue_and_quantity_over_time
 SELECT
     DATE_TRUNC('month', billing_date) AS month,
     SUM(net) AS revenue,
-    COUNT(DISTINCT billing_document) AS orders
+    SUM(billing_qty) AS quantity
 FROM Supabase.invoice
 WHERE customer_name LIKE '${inputs.customer.value}'
     AND material_description LIKE '${inputs.sku.value}'
@@ -164,6 +172,7 @@ SELECT
     material_description AS sku,
     net,
     doc_currency AS currency,
+    sales_unit,
     unit_price,
     billing_qty
 FROM Supabase.invoice
@@ -173,6 +182,8 @@ WHERE customer_name LIKE '${inputs.customer.value}'
     AND billing_qty > 0
 ORDER BY billing_date DESC
 ```
+
+
 ```sql sku
   select
       material_description as sku
@@ -219,16 +230,19 @@ ORDER BY year DESC
         data={sku_summary} 
         value=total_orders
         title="Total Orders"
+        fmt=num0
     />
     <BigValue 
         data={sku_summary} 
         value=total_qty
         title="Total Quantity Sold"
+        fmt=num0
     />
     <BigValue 
         data={sku_summary} 
         value=avg_qty_per_order
         title="Avg Qty per Order"
+        fmt=num0
     />
 </Grid>
 
@@ -237,18 +251,19 @@ ORDER BY year DESC
         data={sku_summary} 
         value=avg_orders_per_month
         title="Avg Monthly Orders"
+        fmt=num0
     />
     <BigValue 
         data={sku_summary} 
         value=total_revenue
         title="Total Revenue"
-        fmt=num0k
+        fmt=num0
     />
     <BigValue 
         data={sku_summary} 
         value=current_year_revenue
         title="Current Year Revenue"
-        fmt=num0k
+        fmt=num0
     />
 </Grid>
 
@@ -270,8 +285,13 @@ ORDER BY year DESC
     />
 </Grid>
 
-<Grid cols=2>
+<ButtonGroup name=matric display=buttons>
+    <ButtonGroupItem valueLabel="Crude Oil Price" value="crude_oil_price" default />
+    <ButtonGroupItem valueLabel="USD-INR" value="usd_inr" />
+</ButtonGroup>
 
+<Grid cols=2>
+<!--
     <LineChart 
     
         data={sku_price_oil_price}
@@ -289,18 +309,34 @@ ORDER BY year DESC
 ]}
         independentYAxes={true}
     />
+-->
+
+<LineChart
+data={price_comparison_table}
+x=date
+y=unit_price
+y2="{inputs.matric}"
+title="Customer SKU Pricing Over Time"
+colorPalette={[
+  '#E4572E', // fiery orange-red
+  '#17BEBB', // bright teal
+  '#FFC914', // vivid yellow
+  '#2E86AB', // strong blue
+  '#F45B69'  // punchy pink
+]}
+/>
 
     <LineChart 
-        data={revenue_and_orders_over_time}
+        data={revenue_and_quantity_over_time}
         x=month
         y=revenue
-        y2=orders
+        y2=quantity
         y2SeriesType=bar
         yAxisTitle="Revenue"
-        y2AxisTitle="Orders"
-        title="Revenue & Orders Over Time"
+        y2AxisTitle="Quantity"
+        title="Revenue & Quantity Over Time"
         ytitle="Revenue"
-        y2title="Orders"
+        y2title="Quantity"
         colorPalette={[
   '#E4572E', // fiery orange-red
   '#17BEBB', // bright teal
@@ -325,38 +361,12 @@ ORDER BY year DESC
     <Column id=billing_date title="Date" align=left/>
     <Column id=billing_document fmt=0 align=center/>
     <Column id=sku title="Material" align=center/>
+    <Column id=sales_unit title="Sales Unit" align=center/>
     <Column id=net title="Net" fmt=num1k align=center/>
     <Column id=currency title="Curr" align=center/>
-    <Column id=unit_price title="Unit Price" fmt=0.0 align=center/>
+    <Column id=unit_price title="Unit Price" fmt=0.00 align=center/>
     <Column id=billing_qty title="Qty" fmt=0 align=center/>
 </DataTable>
-
-```sql sku_share_over_time
-SELECT
-  DATE_TRUNC('month', billing_date) AS month,
-  SUM(CASE 
-      WHEN sku_id LIKE '${inputs.sku.value}'
-      THEN net::numeric 
-      ELSE 0 
-  END) AS sku_revenue,
-  SUM(net::numeric) AS total_revenue,
-  CASE 
-    WHEN SUM(net::numeric) = 0 THEN 0
-    ELSE 
-      SUM(CASE 
-          WHEN sku_id LIKE '${inputs.sku.value}'
-          THEN net::numeric 
-          ELSE 0 
-      END) / SUM(net::numeric)
-  END AS sku_share_raw
-FROM supabase.invoice
-WHERE 
-  billing_qty > 0
-  AND customer_name LIKE '${inputs.customer.value}'
-  AND net ~ '^[0-9.]+$'
-GROUP BY 1
-ORDER BY 1;
-```
 
 ```sql avg_qty_per_order_over_time
 SELECT
@@ -381,3 +391,82 @@ colorPalette={[
 '#17BEBB' // bright teal
 ]}
 />
+
+```sql price_comparison_table
+WITH invoice_data AS (
+    SELECT
+        i.billing_date AS date,
+        i.doc_currency AS currency,
+        AVG(i.unit_price) AS unit_price
+    FROM Supabase.invoice i
+    WHERE i.customer_name LIKE '${inputs.customer.value}'
+        AND i.material_description LIKE '${inputs.sku.value}'
+        AND i.billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+    GROUP BY i.billing_date, i.doc_currency
+),
+oil_data AS (
+    SELECT 
+        o.date,
+        o.dollars_per_barrel,
+        o.usd_inr
+    FROM Supabase.crudeoil o
+    WHERE EXISTS (
+        SELECT 1 FROM invoice_data i
+        WHERE i.date::date = o.date
+    )
+)
+SELECT
+    i.date,
+    i.currency,
+    i.unit_price,
+    o.dollars_per_barrel AS crude_oil_price,
+    o.usd_inr
+FROM invoice_data i
+JOIN oil_data o ON i.date::date = o.date
+ORDER BY i.date DESC, i.currency
+```
+
+
+
+<!--
+
+<Grid >
+<ButtonGroup name=oil_metric >
+    <ButtonGroupItem valueLabel="Oil Price" value="dollars_per_barrel" default />
+    <ButtonGroupItem valueLabel="Dollar Price" value="usd_inr" />
+</ButtonGroup>
+</Grid>
+
+```sql price_comparison_table_2
+    WITH invoice_data AS (
+        select
+            billing_date AS date,
+            doc_currency AS currency,
+            unit_price
+        from supabase.invoice
+        where customer_name = '${inputs.customer.value}'
+        and material_description = '${inputs.sku.value}'
+        and billing_qty > 0
+        and EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+    )
+    SELECT
+        i.date,
+        i.currency,
+        i.unit_price,
+        c.dollars_per_barrel,
+        c.usd_inr
+    FROM invoice_data i
+    LEFT JOIN supabase.crudeoil c ON i.date::date = c.date
+    group by i.date, i.currency, i.unit_price, c.dollars_per_barrel, c.usd_inr
+    ORDER BY i.date
+```
+
+<LineChart
+data={price_comparison_table_2}
+x=date
+y=unit_price
+y2="{inputs.oil_metric}"
+series=currency
+/>
+-->
