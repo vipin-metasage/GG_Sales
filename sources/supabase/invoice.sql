@@ -16,7 +16,8 @@ SELECT
   material_group,
   unit_price,
   incoterms_part1,
-  sd_item_category
+  sd_item_category,
+  total_amount::numeric as total_amount
 FROM cust_gg.invoice_data1
 WHERE 
   material_group IN (

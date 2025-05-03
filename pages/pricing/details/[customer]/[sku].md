@@ -6,7 +6,7 @@ WITH filtered_data AS (
         material_description AS sku,
         billing_date,
         billing_document,
-        net,
+        total_amount,
         billing_qty,
         sales_unit,
         doc_currency,
@@ -26,7 +26,7 @@ base_stats AS (
         ROUND(SUM(billing_qty) * 1.0 / NULLIF(COUNT(DISTINCT billing_document), 0), 2) AS avg_qty_per_order,
         MIN(billing_date) AS first_order,
         MAX(billing_date) AS last_order,
-        SUM(net) AS total_revenue
+        SUM(total_amount) AS total_revenue
     FROM filtered_data
 ),
 monthly_orders AS (
@@ -45,7 +45,7 @@ monthly_stats AS (
 yearly_revenue_split AS (
     SELECT
         EXTRACT(YEAR FROM billing_date) AS year,
-        SUM(net) AS revenue
+        SUM(total_amount) AS revenue
     FROM filtered_data
     GROUP BY 1
 ),
@@ -154,7 +154,7 @@ ORDER BY month, category
 ```sql revenue_and_quantity_over_time
 SELECT
     DATE_TRUNC('month', billing_date) AS month,
-    SUM(net) AS revenue,
+    SUM(total_amount) AS revenue,
     SUM(billing_qty) AS quantity
 FROM Supabase.invoice
 WHERE customer_name LIKE '${inputs.customer.value}'
@@ -170,7 +170,7 @@ SELECT
     billing_date,
     billing_document,
     material_description AS sku,
-    net,
+    total_amount,
     doc_currency AS currency,
     sales_unit,
     unit_price,
@@ -362,7 +362,7 @@ colorPalette={[
     <Column id=billing_document fmt=0 align=center/>
     <Column id=sku title="Material" align=center/>
     <Column id=sales_unit title="Sales Unit" align=center/>
-    <Column id=net title="Net" fmt=num1k align=center/>
+    <Column id=total_amount title="Total Amount" fmt=num1k align=center/>
     <Column id=currency title="Curr" align=center/>
     <Column id=unit_price title="Unit Price" fmt=0.00 align=center/>
     <Column id=billing_qty title="Qty" fmt=0 align=center/>

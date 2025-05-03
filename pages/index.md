@@ -110,7 +110,7 @@ WITH base AS (
         sku_id,
         billing_date,
         billing_document,
-        net,
+        total_amount,
         billing_qty,
         sales_unit,
         doc_currency AS currency,
@@ -178,13 +178,13 @@ aggregated AS (
         SUM(
             CASE
                 WHEN billing_year = (SELECT latest_year FROM year_ref)
-                THEN net ELSE 0
+                THEN total_amount ELSE 0
             END
         ) AS revenue_1y,
         SUM(
             CASE
                 WHEN billing_year = (SELECT latest_year FROM year_ref) - 2
-                THEN net ELSE 0
+                THEN total_amount ELSE 0
             END
         ) AS revenue_3y
     FROM base
@@ -229,7 +229,7 @@ ORDER BY revenue_1y DESC
     data={sku_price_changes}
     title="Customer SKU Pricing Overview"
     link=detail_link
-    rows=20
+    rows=22
     wrapTitles=true
     search=true
 >
