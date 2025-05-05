@@ -189,13 +189,19 @@ ORDER BY billing_date DESC
       material_description as sku
   from Supabase.invoice
   where customer_name = '${params.customer}'
+    AND billing_qty > 0
+    AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
   group by material_description
 ```
+
 ```sql customer
   select
       customer_name as customer
   from Supabase.invoice
   where customer_name = '${params.customer}'
+    AND material_description LIKE '${inputs.sku.value}'
+    AND billing_qty > 0
+    AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
   group by customer_name
 ```
 ```sql year
@@ -203,6 +209,9 @@ SELECT
   EXTRACT(YEAR FROM billing_date) AS year
 FROM Supabase.invoice
 WHERE customer_name LIKE '${params.customer}'
+    AND material_description LIKE '${inputs.sku.value}'
+    AND billing_qty > 0
+    AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
 GROUP BY year
 ORDER BY year DESC
 ```

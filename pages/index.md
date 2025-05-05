@@ -6,6 +6,16 @@ title: Invoice Insights Dashboard
 SELECT
     customer_name as customer
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY customer_name
 ORDER BY customer_name
 ```
@@ -14,6 +24,16 @@ ORDER BY customer_name
 SELECT
     incoterms_part1 as incoterms
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY incoterms_part1
 ORDER BY incoterms_part1
 ```
@@ -22,6 +42,16 @@ ORDER BY incoterms_part1
 SELECT
     EXTRACT(YEAR FROM billing_date) as year 
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY year
 ORDER BY year
 ```
@@ -30,6 +60,16 @@ ORDER BY year
 SELECT
     destination_country as country
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY destination_country
 ORDER BY country
 ```
@@ -38,6 +78,16 @@ ORDER BY country
 SELECT
     doc_currency as currency
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY doc_currency
 ORDER BY currency
 ```
@@ -46,6 +96,16 @@ ORDER BY currency
 SELECT
     sales_unit as sales_unit
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY sales_unit
 ORDER BY sales_unit
 ```
@@ -54,6 +114,16 @@ ORDER BY sales_unit
 SELECT
     material_description as sku
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY material_description
 ORDER BY sku
 ```
@@ -62,6 +132,16 @@ ORDER BY sku
 SELECT
     sku_id as sku_id
 FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY sku_id
 ORDER BY sku_id
 ```
@@ -98,7 +178,7 @@ ORDER BY sku_id
 <Dropdown data={sku_id} name=sku_id value=sku_id title="SKU ID" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
-</center>   
+</center>  
 
 
 ```sql sku_price_changes
@@ -224,6 +304,7 @@ FROM aggregated
 WHERE latest_invoice_date >= CURRENT_DATE - INTERVAL '3 months'
 ORDER BY revenue_1y DESC
 ```
+
 
 <DataTable 
     data={sku_price_changes}
