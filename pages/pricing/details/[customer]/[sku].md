@@ -11,13 +11,17 @@ WITH filtered_data AS (
         sales_unit,
         doc_currency,
         unit_price,
-        sd_item_category,
-        incoterms_part1
+        billing_type,
+        incoterms_part1,
+        payment_term_desc,
+        material_group_desc
     FROM supabase.invoice
     WHERE billing_qty > 0
         AND customer_name LIKE '${inputs.customer.value}'
         AND material_description LIKE '${inputs.sku.value}'
-        AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}' 
+        AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+        AND payment_term_desc LIKE '${inputs.payment_term_desc.value}'
 ),
 base_stats AS (
     SELECT
@@ -67,7 +71,7 @@ latest_txn AS (
 ),
 currencies AS (
     SELECT
-        STRING_AGG(DISTINCT doc_currency, ', ' ORDER BY doc_currency) AS currency_list
+        STRING_AGG(DISTINCT doc_currency, ', ' ORDER BY doc_currency) AS currency_list,
     FROM filtered_data
 ),
 final AS (
@@ -83,7 +87,7 @@ final AS (
         ROUND(COALESCE(yr.revenue, 0) * 100.0 / NULLIF(bs.total_revenue, 0), 2) AS current_year_share,
         lt.unit_price AS latest_unit_price,
         lt.sales_unit,
-        c.currency_list AS currency
+        c.currency_list AS currency,
     FROM base_stats bs
     CROSS JOIN monthly_stats ms
     LEFT JOIN yearly_revenue_split yr ON yr.year = EXTRACT(YEAR FROM CURRENT_DATE)
@@ -92,7 +96,6 @@ final AS (
 )
 SELECT * FROM final
 ```
-
 
 
 ```sql sku_price_oil_price
@@ -105,6 +108,8 @@ WITH invoice_data AS (
         AND i.material_description LIKE '${inputs.sku.value}'
         AND i.billing_qty > 0
         AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+        AND i.material_group_desc LIKE '${inputs.material_group_desc.value}'
+        AND i.payment_term_desc LIKE '${inputs.payment_term_desc.value}'
     GROUP BY i.billing_date
 ),
 oil_data AS (
@@ -161,6 +166,8 @@ WHERE customer_name LIKE '${inputs.customer.value}'
     AND material_description LIKE '${inputs.sku.value}'
     AND billing_qty > 0
     AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
+    AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+    AND payment_term_desc LIKE '${inputs.payment_term_desc.value}'
 GROUP BY month
 ORDER BY month
 ```
@@ -174,12 +181,16 @@ SELECT
     doc_currency AS currency,
     sales_unit,
     unit_price,
-    billing_qty
+    billing_qty,
+    material_group_desc,
+    payment_term_desc
 FROM Supabase.invoice
 WHERE customer_name LIKE '${inputs.customer.value}'
     AND material_description LIKE '${inputs.sku.value}'
     AND EXTRACT(YEAR FROM billing_date) like '${inputs.year.value}'
     AND billing_qty > 0
+    AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+    AND payment_term_desc LIKE '${inputs.payment_term_desc.value}'
 ORDER BY billing_date DESC
 ```
 
@@ -217,20 +228,28 @@ ORDER BY year DESC
 ```
 
 
-<Grid cols=3>
+<center>
 
-<Dropdown data={year} name=year value=year defaultValue='%' title="Year">
+<Dropdown data={year} name=year value=year defaultValue='%' title="Year" >
 <DropdownOption value="%" valueLabel="All Years"/>
 </Dropdown>
 
-<Dropdown data={sku} name=sku value=sku defaultValue='{params.sku}' title="SKU">
+<Dropdown data={material_group_desc} name=material_group_desc value=material_group_desc defaultValue='%' title="Material Group">
+  <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
+
+<Dropdown data={payment_term_desc} name=payment_term_desc value=payment_term_desc defaultValue='%' title="Payment Term">
   <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
 
 <Dropdown data={customer} name=customer value=customer defaultValue='{params.customer}' title="Customer">
 </Dropdown>
 
-</Grid>
+<Dropdown data={sku} name=sku value=sku defaultValue='{params.sku}' title="SKU">
+  <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
+
+</center>
 
 ### SKU Pricing Summary for {params.customer} - {params.sku}
 
@@ -479,3 +498,30 @@ y2="{inputs.oil_metric}"
 series=currency
 />
 -->
+
+```sql material_group_desc
+SELECT
+    material_group_desc as material_group_desc
+FROM Supabase.invoice
+WHERE customer_name = '${params.customer}'
+    AND material_description LIKE '${inputs.sku.value}'
+    AND billing_qty > 0
+    AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+    AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+GROUP BY material_group_desc
+ORDER BY material_group_desc
+```
+
+```sql payment_term_desc
+SELECT
+    payment_term_desc as payment_term_desc
+FROM Supabase.invoice
+WHERE customer_name = '${params.customer}'
+    AND material_description LIKE '${inputs.sku.value}'
+    AND billing_qty > 0
+    AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+    AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+    AND payment_term_desc LIKE '${inputs.payment_term_desc.value}'
+GROUP BY payment_term_desc
+ORDER BY payment_term_desc
+```

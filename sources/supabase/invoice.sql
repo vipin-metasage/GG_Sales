@@ -1,5 +1,5 @@
 SELECT
-  billing_date::date,
+ (billing_date::date || 'T00:00:00Z')::timestamptz AS billing_date,
   REGEXP_REPLACE(INITCAP(LOWER(customer_name)), '[^a-zA-Z0-9]', '_', 'g') as customer_name,
   LOWER(REGEXP_REPLACE(sold_to_party, '^0+', '')) as customer_id,
   destination_country,
@@ -17,7 +17,11 @@ SELECT
   unit_price,
   incoterms_part1,
   sd_item_category,
-  total_amount::numeric as total_amount
+  total_amount::numeric as total_amount,
+  payment_terms_key,
+  billing_type,
+  payment_term_desc,
+  wgbez as material_group_desc
 FROM cust_gg.invoice_data1
 WHERE 
   material_group IN (

@@ -2,6 +2,25 @@
 title: Invoice Insights Dashboard
 ---
 
+```sql material_group_desc
+SELECT
+    material_group_desc as material_group_desc
+FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
+GROUP BY material_group_desc
+ORDER BY material_group_desc
+```
+
 ```sql customer
 SELECT
     customer_name as customer
@@ -15,6 +34,7 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY customer_name
 ORDER BY customer_name
@@ -33,6 +53,7 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY incoterms_part1
 ORDER BY incoterms_part1
@@ -51,6 +72,7 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY year
 ORDER BY year
@@ -69,6 +91,26 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
+        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
+GROUP BY destination_country
+ORDER BY country
+```
+
+```sql country
+SELECT
+    destination_country as country
+FROM Supabase.invoice
+WHERE billing_qty > 0
+        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
+        AND customer_name LIKE '${inputs.customer.value}'
+        AND destination_country LIKE '${inputs.country.value}'
+        AND doc_currency LIKE '${inputs.currency.value}'
+        AND sales_unit LIKE '${inputs.sales_unit.value}'
+        AND material_description LIKE '${inputs.sku.value}'
+        AND sku_id LIKE '${inputs.sku_id.value}'
+        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY destination_country
 ORDER BY country
@@ -87,6 +129,7 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY doc_currency
 ORDER BY currency
@@ -105,6 +148,7 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY sales_unit
 ORDER BY sales_unit
@@ -123,6 +167,7 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY material_description
 ORDER BY sku
@@ -141,15 +186,13 @@ WHERE billing_qty > 0
         AND material_description LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
         AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
 GROUP BY sku_id
 ORDER BY sku_id
 ```
 
 <center>
-<Dropdown data={customer} name=customer value=customer title="Customer">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
 
 <Dropdown data={year} name=year value=year title="Year" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
@@ -163,9 +206,10 @@ ORDER BY sku_id
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
 
-<Dropdown data={incoterms} name=incoterms value=incoterms title="Incoterms" defaultValue="%">
+<Dropdown data={incoterms} name=incoterms value=incoterms title="Ship Type" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
+
 
 <Dropdown data={sales_unit} name=sales_unit value=sales_unit title="Sales Unit" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
@@ -178,6 +222,15 @@ ORDER BY sku_id
 <Dropdown data={sku_id} name=sku_id value=sku_id title="SKU ID" defaultValue="%">
     <DropdownOption value="%" valueLabel="All"/>
 </Dropdown>
+
+<Dropdown data={material_group_desc} name=material_group_desc value=material_group_desc title="Material Group" defaultValue="%">
+    <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
+
+<Dropdown data={customer} name=customer value=customer title="Customer">
+    <DropdownOption value="%" valueLabel="All"/>
+</Dropdown>
+
 </center>  
 
 
@@ -196,8 +249,9 @@ WITH base AS (
         doc_currency AS currency,
         EXTRACT(YEAR FROM billing_date) AS billing_year,
         unit_price,
-        sd_item_category,
-        incoterms_part1
+        billing_type,
+        incoterms_part1,
+        material_group_desc
     FROM invoice
 ),  
 year_ref AS (
@@ -263,7 +317,7 @@ aggregated AS (
         ) AS revenue_1y,
         SUM(
             CASE
-                WHEN billing_year = (SELECT latest_year FROM year_ref) - 2
+                WHEN billing_year = (SELECT latest_year FROM year_ref) - 3
                 THEN total_amount ELSE 0
             END
         ) AS revenue_3y
@@ -277,6 +331,7 @@ aggregated AS (
         AND sku LIKE '${inputs.sku.value}'
         AND sku_id LIKE '${inputs.sku_id.value}'
         AND incoterms_part1 LIKE '${inputs.incoterms.value}'
+        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
     GROUP BY customer, country, sku, sku_id
 )
 SELECT
