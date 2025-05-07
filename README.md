@@ -1,48 +1,80 @@
-# Evidence Template Project
+# Global Green Sales Dashboard
 
-## Using Codespaces
+Welcome to the Global Green Sales Dashboard - A comprehensive analytics platform for tracking and analyzing sales performance, pricing strategies, and customer insights.
 
-If you are using this template in Codespaces, click the `Start Evidence` button in the bottom status bar. This will install dependencies and open a preview of your project in your browser - you should get a popup prompting you to open in browser.
+## Overview
 
-Or you can use the following commands to get started:
+This dashboard provides detailed insights into:
+- Customer SKU pricing and trends
+- Material group analysis
+- Payment terms and shipping conditions
+- Revenue and quantity metrics
+- Historical pricing data
+- Oil price correlations
 
-```bash
-npm install
-npm run sources
-npm run dev -- --host 0.0.0.0
-```
+## Key Features
 
-See [the CLI docs](https://docs.evidence.dev/cli/) for more command information.
+### 1. Main Dashboard
+- Comprehensive overview of all sales metrics
+- Multiple filtering options:
+  - Year
+  - Customer
+  - Country
+  - Currency
+  - Ship Type (Incoterms)
+  - Sales Unit
+  - SKU
+  - Material Group
+  - Payment Terms
 
-**Note:** Codespaces is much faster on the Desktop app. After the Codespace has booted, select the hamburger menu → Open in VS Code Desktop.
+### 2. SKU Details Page
+- Detailed analysis for specific SKUs including:
+  - Pricing history
+  - Order quantities
+  - Revenue trends
+  - Payment terms
+  - Material group categorization
+  - Correlation with oil prices
 
-## Get Started from VS Code
+### 3. Interactive Features
+- Dynamic filtering
+- Real-time data updates
+- Interactive charts and graphs
+- Detailed data tables
+- Export capabilities
 
-The easiest way to get started is using the [VS Code Extension](https://marketplace.visualstudio.com/items?itemName=Evidence.evidence-vscode):
+## Quick Access
 
+[Go to Main Dashboard](pages/index.md)
 
+## Data Sources
 
-1. Install the extension from the VS Code Marketplace
-2. Open the Command Palette (Ctrl/Cmd + Shift + P) and enter `Evidence: New Evidence Project`
-3. Click `Start Evidence` in the bottom status bar
+The dashboard integrates data from:
+- Sales invoices
+- Customer information
+- Material master data
+- Crude oil price data
+- Currency exchange rates
 
-## Get Started using the CLI
+## Technical Details
 
-```bash
-npx degit evidence-dev/template my-project
-cd my-project 
-npm install 
-npm run sources
-npm run dev 
-```
+- Built with Evidence
+- Real-time data processing
+- SQL-based analytics
+- Responsive design
+- Interactive visualizations
 
-Check out the docs for [alternative install methods](https://docs.evidence.dev/getting-started/install-evidence) including Docker, Github Codespaces, and alongside dbt.
+## Getting Started
 
+1. Use the filters at the top of the dashboard to narrow down your view
+2. Click on any SKU to view detailed information
+3. Explore different metrics using the interactive charts
+4. Export data as needed for further analysis
 
+## Support
 
-## Learning More
+For any questions or support needs, please contact the development team.
 
-- [Docs](https://docs.evidence.dev/)
-- [Github](https://github.com/evidence-dev/evidence)
-- [Slack Community](https://slack.evidence.dev/)
-- [Evidence Home Page](https://www.evidence.dev)
+---
+
+*Last Updated: [Current Date]*
