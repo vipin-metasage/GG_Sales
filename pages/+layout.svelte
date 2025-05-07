@@ -14,7 +14,9 @@
     <!-- Footer Navigation Bar -->
     <footer class="bg-gray-800 text-white py-3 px-5 shadow-md fixed bottom-0 left-0 w-full rounded-t-sm">
         <ul class="flex justify-center gap-6 text-sm">
-            <li><a href="/" class="hover:text-green-400">🏠 Home</a></li>
+            <li><a href="/" class="hover:text-green-400">📈 Overview</a></li>
+            <li><a href="/invoice" class="hover:text-green-400">🏠 Invoice Insights</a></li>
+            
 
         </ul>
     </footer>

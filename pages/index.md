@@ -1,389 +1,92 @@
----
-title: Invoice Insights Dashboard
----
-
-```sql material_group_desc
-SELECT
-    material_group_desc as material_group_desc
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY material_group_desc
-ORDER BY material_group_desc
-```
-
-```sql customer
-SELECT
-    customer_name as customer
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY customer_name
-ORDER BY customer_name
-```
-
-```sql incoterms
-SELECT
-    incoterms_part1 as incoterms
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY incoterms_part1
-ORDER BY incoterms_part1
-```
-
-```sql year
-SELECT
-    EXTRACT(YEAR FROM billing_date) as year 
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY year
-ORDER BY year
-```
-
-```sql country
-SELECT
-    destination_country as country
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY destination_country
-ORDER BY country
-```
-
-```sql country
-SELECT
-    destination_country as country
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY destination_country
-ORDER BY country
-```
-
-```sql currency
-SELECT
-    doc_currency as currency
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY doc_currency
-ORDER BY currency
-```
-
-```sql sales_unit
-SELECT
-    sales_unit as sales_unit
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY sales_unit
-ORDER BY sales_unit
-```
-
-```sql sku
-SELECT
-    material_description as sku
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY material_description
-ORDER BY sku
-```
-
-```sql sku_id
-SELECT
-    sku_id as sku_id
-FROM Supabase.invoice
-WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer_name LIKE '${inputs.customer.value}'
-        AND destination_country LIKE '${inputs.country.value}'
-        AND doc_currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND material_description LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-        AND billing_date >= CURRENT_DATE - INTERVAL '3 months'
-GROUP BY sku_id
-ORDER BY sku_id
-```
-
 <center>
+<h1 style="color: #2E7D32; margin: 20px 0; font-size: 2.5em;"> <strong>Global Green Sales Dashboard</strong></h1>
+</center>
 
-<Dropdown data={year} name=year value=year title="Year" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
-
-<Dropdown data={country} name=country value=country title="Country" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
-
-<Dropdown data={currency} name=currency value=currency title="Currency" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
-
-<Dropdown data={incoterms} name=incoterms value=incoterms title="Ship Type" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
+<div style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 10px; margin: 20px auto; max-width: 800px;">
+  <p style="font-size: 18px; margin: 0;">
+     This sales analytics dashboard helps you track product price changes and analyze pricing trends. Use these insights to negotiate future prices with customers with supporting data-driven evidence.
+  </p>
+</div>
 
 
-<Dropdown data={sales_unit} name=sales_unit value=sales_unit title="Sales Unit" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
+## Key Business Questions
 
-<Dropdown data={sku} name=sku value=sku title="SKU" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+  <div style="background-color: #E8F5E9; padding: 15px; border-radius: 8px;">
+    <h4 style="color: #2E7D32; margin-top: 0;">Price Analysis</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li>How have our product prices changed over time?</li>
+      <li>Are we charging different prices to different customers?</li>
+    </ul>
+  </div>
+  
+  <div style="background-color: #FFF3E0; padding: 15px; border-radius: 8px;">
+    <h4 style="color: #E65100; margin-top: 0;">Market & Revenue</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li>How do our price changes correlate with market factors(Crude oil prices & USD)?</li>
+      <li>What is the revenue impact of our historical price changes?</li>
+    </ul>
+  </div>
+  
+  <div style="background-color: #E3F2FD; padding: 15px; border-radius: 8px;">
+    <h4 style="color: #1565C0; margin-top: 0;">Opportunities</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li>Which products need price updates?</li>
+      <li>Where are our pricing opportunities?</li>
+    </ul>
+  </div>
+</div>
 
-<Dropdown data={sku_id} name=sku_id value=sku_id title="SKU ID" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
+## Dashboard Features
 
-<Dropdown data={material_group_desc} name=material_group_desc value=material_group_desc title="Material Group" defaultValue="%">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+  <div style="background-color: #E8F5E9; padding: 20px; border-radius: 8px;">
+    <h3 style="color: #2E7D32; margin-top: 0;">Main Dashboard</h3>
+    <p>Comprehensive view with multiple filtering options:</p>
+    <ul>
+      <li>Customer SKU pricing overview</li>
+      <li>Price change history</li>
+      <li>Revenue and quantity details</li>
+    </ul>
+    <p><strong>Filters:</strong> Year, Customer, Country, Currency, Ship Type, Sales Unit, SKU, Material Group, Payment Terms</p>
+  </div>
 
-<Dropdown data={customer} name=customer value=customer title="Customer">
-    <DropdownOption value="%" valueLabel="All"/>
-</Dropdown>
+  <div style="background-color: #E3F2FD; padding: 20px; border-radius: 8px;">
+    <h3 style="color: #1565C0; margin-top: 0;">SKU Details</h3>
+    <p>In-depth analysis for specific SKUs:</p>
+    <ul>
+      <li>Detailed price history</li>
+      <li>Order quantities over time</li>
+      <li>Price correlation with oil prices</li>
+      <li>Transaction-level details</li>
+    </ul>
+    <p><strong>Filters:</strong> Year, Customer, Material Group, Payment Term, SKU</p>
+  </div>
+</div>
 
-</center>  
+## Getting Started
 
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+  <ol style="margin: 0; padding-left: 20px;">
+    <li>Start at the main dashboard for a broad overview</li>
+    <li>Use filters to focus on specific segments</li>
+    <li>Click on any SKU for detailed performance history</li>
+    <li>Use insights to support pricing decisions</li>
+  </ol>
+</div>
 
-```sql sku_price_changes
-WITH base AS (
-    SELECT
-        customer_name AS customer,
-        destination_country AS country,
-        material_description AS sku,
-        sku_id,
-        billing_date,
-        billing_document,
-        total_amount,
-        billing_qty,
-        sales_unit,
-        doc_currency AS currency,
-        EXTRACT(YEAR FROM billing_date) AS billing_year,
-        unit_price,
-        billing_type,
-        incoterms_part1,
-        material_group_desc
-    FROM invoice
-),  
-year_ref AS (
-    SELECT MAX(EXTRACT(YEAR FROM billing_date)) AS latest_year
-    FROM invoice
-),
-aggregated AS (
-    SELECT
-        customer,
-        country,
-        sku,
-        sku_id,
-        MAX(billing_date) AS latest_invoice_date,
-        ANY_VALUE(sales_unit) AS sales_unit,
-        ANY_VALUE(currency) AS currency,
-        ANY_VALUE(unit_price) AS current_unit_price,
-        (
-            SELECT b2.unit_price
-            FROM base b2
-            WHERE b2.customer = base.customer
-                AND b2.sku = base.sku
-                AND b2.billing_date < MAX(base.billing_date)
-                AND b2.unit_price <> ANY_VALUE(base.unit_price)
-                AND b2.unit_price > 0
-            ORDER BY b2.billing_date DESC
-            LIMIT 1
-        ) AS last_unit_price,
-        (
-            SELECT billing_date
-            FROM base b2
-            WHERE b2.customer = base.customer
-                AND b2.sku = base.sku
-                AND b2.billing_date < MAX(base.billing_date)
-                AND b2.unit_price <> ANY_VALUE(base.unit_price)
-                AND b2.unit_price > 0
-            ORDER BY b2.billing_date DESC
-            LIMIT 1
-        ) AS last_price_change_date,
-        (
-            SELECT
-                EXTRACT(YEAR FROM MAX(base.billing_date))
-                - EXTRACT(YEAR FROM b2.billing_date)
-            FROM base b2
-            WHERE b2.customer = base.customer
-                AND b2.sku = base.sku
-                AND b2.billing_date < MAX(base.billing_date)
-                AND b2.unit_price <> ANY_VALUE(base.unit_price)
-                AND b2.unit_price > 0
-            ORDER BY b2.billing_date DESC
-            LIMIT 1
-        ) AS years_since_price_change,
-        COUNT(DISTINCT billing_document) AS orders,
-        SUM(billing_qty) AS sku_quantity,
-        ROUND(
-            SUM(billing_qty) * 1.0
-            / NULLIF(COUNT(DISTINCT billing_document), 0)
-        , 2) AS avg_sku_per_order,
-        SUM(
-            CASE
-                WHEN billing_year = (SELECT latest_year FROM year_ref)
-                THEN total_amount ELSE 0
-            END
-        ) AS revenue_1y,
-        SUM(
-            CASE
-                WHEN billing_year = (SELECT latest_year FROM year_ref) - 3
-                THEN total_amount ELSE 0
-            END
-        ) AS revenue_3y
-    FROM base
-    WHERE billing_qty > 0
-        AND EXTRACT(YEAR FROM billing_date) LIKE '${inputs.year.value}'
-        AND customer LIKE '${inputs.customer.value}'
-        AND country LIKE '${inputs.country.value}'
-        AND currency LIKE '${inputs.currency.value}'
-        AND sales_unit LIKE '${inputs.sales_unit.value}'
-        AND sku LIKE '${inputs.sku.value}'
-        AND sku_id LIKE '${inputs.sku_id.value}'
-        AND incoterms_part1 LIKE '${inputs.incoterms.value}'
-        AND material_group_desc LIKE '${inputs.material_group_desc.value}'
-    GROUP BY customer, country, sku, sku_id
-)
-SELECT
-    customer,
-    country,
-    sku,
-    sku_id,
-    latest_invoice_date,
-    sales_unit,
-    currency,
-    current_unit_price,
-    last_unit_price,
-    '/pricing/details/' || customer || '/' || sku AS detail_link,
-    NULLIF(
-        last_price_change_date::DATE,
-        '1970-01-01'::DATE
-    )::TEXT AS last_price_change_date,
-    years_since_price_change,
-    orders,
-    sku_quantity,
-    avg_sku_per_order,
-    revenue_1y,
-    revenue_3y
-FROM aggregated
-WHERE latest_invoice_date >= CURRENT_DATE - INTERVAL '3 months'
-ORDER BY revenue_1y DESC
-```
+<div style="text-align: center; padding: 15px; background-color: #E8F5E9; border-radius: 10px; margin: 20px auto; max-width: 800px;">
+  <p style="font-size: 18px; margin: 0;">
+    <strong>Note:</strong> Orders are counted as number of invoices.<br>
+    Data range: 01-01-2015 to 07-02-2025
+  </p>
+</div>
 
 
-<DataTable 
-    data={sku_price_changes}
-    title="Customer SKU Pricing Overview"
-    link=detail_link
-    rows=22
-    wrapTitles=true
-    search=true
->
-    <Column id="customer" title="Customer" align="left" />
-    <Column id="country" title="Country" align="center" />
-    <Column id="sku" title="Material Name" align="left" />
-    <Column id="sales_unit" title="Unit" align="center" />
-    <Column id="currency" title="Currency" align="center" />
-    <Column id="latest_invoice_date" title="Latest Invoice" align="center" colGroup="Timing"/>
-    <Column id="last_price_change_date" title="Last Price Change" align="center" colGroup="Timing"/>
-    <Column id="years_since_price_change" title="Yrs Since Change" align="center" colGroup="Timing"/>
-    <Column id="current_unit_price" title="Current Price" align="center" colGroup="Pricing"/>
-    <Column id="last_unit_price" title="Prev. Price" align="center" fmt="0.00" colGroup="Pricing"/>
-    <Column id="orders" title="Orders" align="center" colGroup="Volume"/>
-    <Column id="avg_sku_per_order" title="Avg/Order" align="center" colGroup="Volume"/>
-    <Column id="sku_quantity" title="SKU Qty Sold" fmt='num1k' align="center" colGroup="Volume"/>
-    <Column id="revenue_1y" title="Revenue (1Y)" fmt="num1k" align="center" colGroup="Revenue"/>
-    <Column id="revenue_3y" title="Revenue (3Y)" fmt="num1k" align="center" colGroup="Revenue"/>
-</DataTable>
+<div style="text-align: center; margin: 30px 0;">
+  <a href="/invoice" class="button" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 4px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Go to Dashboard</a>
+</div>
+
+---
 
 
