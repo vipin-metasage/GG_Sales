@@ -381,11 +381,8 @@ FROM aggregated
 WHERE latest_invoice_date >= (SELECT max_billing_date - INTERVAL '3 months' FROM max_date)
 ORDER BY revenue_1y DESC
 ```
-<right>
 
-<Info description="Orders are counted as the number of invoices" color="red" />
 
-</right>
 
 <DataTable 
     data={sku_price_changes}
