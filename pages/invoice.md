@@ -335,7 +335,8 @@ aggregated AS (
         ) AS revenue_1y,
         SUM(
             CASE
-                WHEN billing_year = (SELECT latest_year FROM year_ref) - 3
+                WHEN billing_year >= (SELECT latest_year FROM year_ref) - 2
+                AND billing_year <= (SELECT latest_year FROM year_ref)
                 THEN total_amount ELSE 0
             END
         ) AS revenue_3y
