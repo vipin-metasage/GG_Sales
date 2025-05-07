@@ -1,104 +1,63 @@
 ---
-title: Global Green Sales Analytics Overview
+title: Global Green Sales Dashboard Overview
 ---
 
-# Global Green Sales Analytics Dashboard
+<center>
+<img src="/static/globalgreen.png" alt="Global Green Logo" width="200"/>
+</center>
 
-Welcome to the Global Green Sales Analytics Dashboard - Your comprehensive platform for analyzing sales performance, pricing strategies, and market insights in the chemical industry.
+# Global Green Sales Dashboard
 
-## Dashboard Overview
+**Dashboard Objective:** This sales analytics dashboard helps you track product price changes and analyze pricing trends. Use these insights to negotiate future prices with customers with supporting data-driven evidence.
 
-This analytics platform provides deep insights into:
-- Customer-specific SKU pricing and market trends
-- Material group performance analysis
-- Payment terms and shipping condition patterns
-- Revenue and quantity metrics by region
-- Historical pricing analysis
-- Correlation with crude oil prices and currency fluctuations
+## What to Expect
 
-## Key Features
+### Main Dashboard (Home Page)
+The main dashboard provides a comprehensive view of all sales data with multiple filtering options to drill down into specific segments. It displays:
 
-### 1. Sales Analytics Dashboard
-- Real-time overview of sales performance metrics
-- Advanced filtering capabilities:
-  - Year-based analysis
-  - Customer segmentation
-  - Geographic distribution (Country-wise)
-  - Currency-based revenue tracking
-  - Shipping condition analysis (Incoterms)
-  - Product unit analysis
-  - SKU-level insights
-  - Material group categorization
-  - Payment term analysis
+- Customer SKU pricing overview table
+- Price change history visualization
+- Revenue and quantity analysis
+- Year-over-year comparisons
 
-### 2. SKU Performance Analysis
-- In-depth analysis for each SKU including:
-  - Historical pricing trends
-  - Order volume patterns
-  - Revenue analysis
-  - Payment term preferences
-  - Material group performance
-  - Correlation with market indicators (Oil prices, USD/INR)
+**Available Filters:**
+- Year
+- Customer
+- Country
+- Currency
+- Ship Type (Incoterms)
+- Sales Unit
+- SKU (Name)
+- SKU ID
+- Material Group
+- Payment Terms
 
-### 3. Interactive Analytics Features
-- Dynamic data filtering and segmentation
-- Real-time data visualization
-- Interactive performance charts
-- Detailed transaction analysis
-- Data export functionality
+### SKU Details Page
+When you click on a specific SKU, you'll access an in-depth analysis page showing:
 
-## Quick Navigation
+- Detailed price history for that specific SKU
+- Order quantities over time
+- Price correlation with oil prices
+- Transaction-level details
 
-[Access Main Dashboard](/index)
+**Available Filters:**
+- Year
+- Customer
+- Material Group
+- Payment Term
+- SKU
 
-## Data Integration
+## Getting Started
 
-The dashboard seamlessly integrates:
-- Sales transaction data
-- Customer master information
-- Product master data
-- Crude oil price trends
-- Currency exchange rate data
+1. Start at the main dashboard to get a broad overview
+2. Use filters to focus on specific customers, products, or regions
+3. Click on any SKU to view its detailed performance history
+4. Use the insights to support pricing decisions and negotiations
 
-## Analytics Capabilities
-
-- Advanced SQL-based analytics
-- Real-time data processing
-- Interactive data visualization
-- Customizable reporting
-- Trend analysis tools
-
-## Getting Started Guide
-
-1. Begin with the main dashboard filters to focus on specific segments
-2. Click on any SKU to access detailed performance metrics
-3. Utilize the interactive charts for trend analysis
-4. Export specific data sets for detailed analysis
-
-## Key Metrics
-
-- Revenue Analysis
-  - Year-over-Year growth
-  - Customer-wise revenue
-  - Product-wise revenue
-  - Regional revenue distribution
-
-- Pricing Analysis
-  - Historical price trends
-  - Price change frequency
-  - Market correlation
-  - Currency impact
-
-- Volume Analysis
-  - Order quantities
-  - Average order size
-  - Product mix
-  - Customer-wise volume
-
-## Support and Assistance
-
-For technical support or data analysis assistance, please contact the analytics team.
+<center>
+<a href="/index" class="button" style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px;">Go to Dashboard</a>
+</center>
 
 ---
 
-*Last Updated: March 2024* 
+
